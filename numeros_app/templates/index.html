@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Destiny - Ваша персональная нумерология</title>
+    <style>
+        :root {
+            --primary: #0A84FF;
+            --danger: #FF3B30;
+            --success: #32D74B;
+            --background: #F5F5F7;
+            --surface: #FFFFFF;
+            --text: #1D1D1F;
+            --border: #E5E5EA;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .calc-nav {
+            display: flex;
+            gap: 10px;
+            margin: 40px 0;
+            overflow-x: auto;
+        }
+
+        .calc-tab {
+            padding: 15px 25px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .calc-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .calculator-form {
+            background: var(--surface);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            margin: 20px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+
+        .cta-button {
+            background: var(--primary);
+            color: white;
+            padding: 18px 36px;
+            border: none;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section {
+            margin: 60px 0;
+            padding: 40px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 25px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+
+        .timer {
+            background: var(--danger);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 25px 0;
+            font-weight: 600;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            display: none;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 4px;
+            background: transparent;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .cta-button:hover {
+            animation: pulse 1.5s infinite;
+            opacity: 0.95;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <h1 style="font-size: 2.8rem; margin-bottom: 20px;">Ваша судьба закодирована в дате рождения</h1>
+            <p style="font-size: 1.2rem; color: #666; max-width: 800px; margin: 0 auto;">
+                Метод «Матрица судьбы» раскроет ваш скрытый потенциал, предскажет финансовые возможности
+                и поможет найти идеального партнёра с точностью 93%
+            </p>
+        </div>
+
+        <div class="calc-nav">
+            <div class="calc-tab active" onclick="switchTab(1)">Личная матрица</div>
+            <div class="calc-tab" onclick="switchTab(2)">Совместимость</div>
+            <div class="calc-tab" onclick="switchTab(3)">Детский анализ</div>
+        </div>
+
+        <!-- Основная форма -->
+        <div class="calculator-form" id="form-1">
+            <div class="form-group">
+                <label>Ваше имя</label>
+                <input type="text" placeholder="Например: Анна">
+            </div>
+            <div class="form-group">
+                <label>Дата рождения</label>
+                <input type="date" required>
+            </div>
+            <button class="cta-button" onclick="showResult()">
+                🔮 Рассчитать бесплатно
+            </button>
+        </div>
+
+        <!-- Блок преимуществ -->
+        <div class="section">
+            <h2 style="text-align: center; margin-bottom: 40px;">Что вы узнаете:</h2>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <h3>💰 Финансовый код</h3>
+                    <p style="color: #666; margin-top: 15px;">
+                        Точная дата, когда вы сможете выйти на пассивный доход
+                        и оптимальные направления для инвестиций
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <h3>💞 Идеальный партнёр</h3>
+                    <p style="color: #666; margin-top: 15px;">
+                        Точные характеристики вашей второй половинки и
+                        период, когда произойдёт встреча
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏆 Скрытые таланты</h3>
+                    <p style="color: #666; margin-top: 15px;">
+                        Профессии, где вы сможете реализоваться
+                        и зарабатывать в 3 раза больше
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- После hero, перед calc-nav -->
+        <div class="section" style="margin-top: -30px;">
+            <div class="scroll-container" style="display: flex; gap: 25px; overflow-x: auto; padding: 15px 0;">
+                <div style="flex-shrink: 0; padding: 12px 20px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border)">
+                    🚀 12,345 матриц расшифровано за месяц
+                </div>
+                <div style="flex-shrink: 0; padding: 12px 20px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border)">
+                    📱 97% точности по отзывам клиентов
+                </div>
+                <div style="flex-shrink: 0; padding: 12px 20px; background: var(--surface); border-radius: 12px; border: 1px solid var(--border)">
+                    💡 Основано на работах Пифагора и Кроули
+                </div>
+            </div>
+        </div>
+
+        <!-- После калькуляторной формы -->
+        <div class="section">
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h2>Откройте своё цифровое ДНИ</h2>
+                <p style="color: #666;">Алгоритм анализирует 27 параметров, включая:</p>
+            </div>
+
+            <div class="grid-3" style="margin-bottom: 60px;">
+                <div class="feature-card">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: grid; place-items: center; color: white;">1</div>
+                        <h3 style="margin: 0;">Кармические долги</h3>
+                    </div>
+                    <p style="color: #666; margin-top: 15px;">Неоплаченные обязательства из прошлых воплощений</p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: grid; place-items: center; color: white;">2</div>
+                        <h3 style="margin: 0;">Циклы удачи</h3>
+                    </div>
+                    <p style="color: #666; margin-top: 15px;">Пиковые периоды для старта проектов и отношений</p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <div style="width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: grid; place-items: center; color: white;">3</div>
+                        <h3 style="margin: 0;">Энергетические каналы</h3>
+                    </div>
+                    <p style="color: #666; margin-top: 15px;">Источники сил и точки энергопотерь</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- После блока с таймером -->
+        <div class="section" style="background: linear-gradient(45deg, var(--primary), #6C79FF); color: white; border-radius: 18px;">
+            <div class="container">
+                <div style="max-width: 800px; margin: 0 auto; text-align: center; padding: 50px 20px;">
+                    <h2 style="margin-bottom: 25px;">Как это работает?</h2>
+                    <div class="grid-3" style="color: white;">
+                        <div>
+                            <h3>1. Ввод данных</h3>
+                            <p>3 параметра для базовой матрицы</p>
+                        </div>
+                        <div>
+                            <h3>2. Квантовый расчёт</h3>
+                            <p>Анализ 144+ нумерологических связей</p>
+                        </div>
+                        <div>
+                            <h3>3. Персонализация</h3>
+                            <p>GPT-4o адаптирует выводы под ваш профиль</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Перед модалкой -->
+        <div class="section">
+            <h2 style="text-align: center; margin-bottom: 40px;">Реальные кейсы</h2>
+            <div class="grid-3">
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://placehold.co/50x50" style="border-radius: 50%" alt="">
+                        <div>
+                            <h4 style="margin: 0;">Алина, 28 лет</h4>
+                            <p style="color: #666; margin: 0;">Москва</p>
+                        </div>
+                    </div>
+                    <p style="color: #666;">«Нашла мужа через 2 месяца после анализа. Он совпал по 19/21 параметру»</p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://placehold.co/50x50" style="border-radius: 50%" alt="">
+                        <div>
+                            <h4 style="margin: 0;">Максим, 35 лет</h4>
+                            <p style="color: #666; margin: 0;">Казань</p>
+                        </div>
+                    </div>
+                    <p style="color: #666;">«Сменил профессию по совету системы — доход вырос в 4х»</p>
+                </div>
+                <div class="feature-card">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://placehold.co/50x50" style="border-radius: 50%" alt="">
+                        <div>
+                            <h4 style="margin: 0;">Ольга, 41 год</h4>
+                            <p style="color: #666; margin: 0;">Сочи</p>
+                        </div>
+                    </div>
+                    <p style="color: #666;">«Избежала рискованных инвестиций благодаря предупреждению»</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- В конец перед </div> -->
+        <footer style="border-top: 1px solid var(--border); margin-top: 80px; padding: 40px 0;">
+            <div style="text-align: center; color: #666;">
+                <p>© 2024 Matrix Destiny. Не медицинский сервис</p>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px;">
+                    <a href="#" style="color: var(--text); text-decoration: none;">Конфиденциальность</a>
+                    <a href="#" style="color: var(--text); text-decoration: none;">Отказ от ответственности</a>
+                    <a href="#" style="color: var(--text); text-decoration: none;">Поддержка</a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Модальное окно -->
+        <div class="modal" id="modal">
+            <h2 style="margin-bottom: 15px;">Ваш анализ готов!</h2>
+            <p style="color: #666; margin-bottom: 25px;">
+                Обнаружено 3 критические точки в вашей матрице.
+                Для разблокировки полного отчёта:
+            </p>
+            <button class="cta-button" onclick="redirectToTelegram()" style="width: 100%;">
+                💎 Получить за 299₽ →
+            </button>
+            <p style="margin-top: 20px; color: var(--danger); font-size: 0.9rem;">
+                ⚠️ Предложение действует ближайшие 15 минут
+            </p>
+        </div>
+        <div class="modal-overlay" id="overlay"></div>
+    </div>
+
+    <script>
+        function switchTab(tabNumber) {
+            document.querySelectorAll('.calculator-form').forEach(form => form.style.display = 'none');
+            document.getElementById(`form-${tabNumber}`).style.display = 'block';
+            document.querySelectorAll('.calc-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        let timeLeft = 3599;
+        const timerId = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent =
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            if(timeLeft <= 0) clearInterval(timerId);
+        }, 1000);
+
+        function showResult() {
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+
+        function redirectToTelegram() {
+            window.location.href = 'https://t.me/YOUR_BOT';
+        }
+
+        setInterval(() => {
+            const notifications = [
+                "🎉 Мария из Москвы только что получила отчёт!",
+                "🔥 Иван купил полную расшифровку!",
+                "💎 Осталось 3 места по акции!"
+            ];
+            const notification = document.createElement('div');
+            notification.className = 'timer';
+            notification.style.background = 'var(--success)';
+            notification.textContent = notifications[Math.floor(Math.random()*3)];
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }, 8000);
+    </script>
+</body>
+</html>
