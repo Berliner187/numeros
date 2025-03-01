@@ -1,0 +1,3 @@
+/numeros_app/.env
+*.pyc
+*.sqlite3
